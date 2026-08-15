@@ -1,1 +1,15 @@
 Hi! This is the basic learning and the basic steps during the project we will learn 
+
+1- Node.js install  | node -v, npm -v
+2- Expo project  | npx create-expo-app LogicLand
+-> cd LogicLand
+-> npx expo start
+
+3- App -> tab k andr hoga hmare pas index.js wali screen us pe kam krna hai like routing k liye 
+
+4- Components k andr sari files jo jo needed hain jese theme , island map , profile , logic
+ 
+4- "Replace emojis by icons"npx expo install react-native-svg 
+
+
+

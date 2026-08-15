@@ -1,5 +1,5 @@
-import IslandMapScreen from '../../components/IslandMapScreen';
+import OpeningScreen  from '../../components/OpeningScreen';
 
 export default function HomeScreen() {
-  return <IslandMapScreen />;
+  return <OpeningScreen />;
 }
