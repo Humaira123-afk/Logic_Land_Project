@@ -1,0 +1,4 @@
+git status
+git add .
+git commit -m "Added animated LogicLand splash screen and login page"
+git push origin main

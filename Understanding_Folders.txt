@@ -1,0 +1,56 @@
+index.js/index.tsx hi "main" kyun mangta hai?
+
+Ye ek web development ka standard convention hai jo Expo Router ne bhi follow kiya hai. Jaise browser mein jab aap koi folder open karte hain bina file naam diye (example.com/about/), server automatically about/index.html dhoondta hai.
+
+Expo Router mein bhi yahi rule hai:
+
+app/
+ ├── index.tsx           👈 route: "/"  (app khulte hi ye screen)
+ ├── (tabs)/
+ │    ├── index.tsx      👈 route: "/(tabs)/" ya "/" (Home tab, default)
+ │    └── explore.tsx    👈 route: "/(tabs)/explore"
+
+Matlab: jis bhi folder mein index.tsx ho, wo us folder ka default/pehla page ban jata hai. Isliye aap ki Home tab ka naam index.tsx hai — jab user "Home" tab pe click karay, sabse pehli/default screen wahi khulni chahiye, aur Expo Router isay khud-ba-khud pehchan leta hai bina extra config ke.
+
+Agar aap index.tsx ki jagah home.tsx rakhtin, to route /home banta — jo bilkul chal jata, lekin phir aap ko manually specify karna parta ke "default" route kaunsa hai.
+
+components/ folder mein "different screens" kyun hoti hain?
+
+Ye thora confusing lag sakta hai, to clear karta hoon:
+
+app/ folder = ROUTES (URLs/navigation paths)
+
+Yahan sirf wo files hain jo directly ek screen/URL banati hain
+Expo Router in files ko automatically scan karta hai
+
+components/ folder = REUSABLE PIECES (UI logic)
+
+Yahan actual design/logic likha jata hai
+In files ka route se koi seedha talluq nahi — ye sirf functions/components hain jo kahin bhi import ho sakte hain
+
+Practical example aap ke project se:
+
+jsx
+// app/(tabs)/index.tsx  -- YE ROUTE FILE HAI
+import OpeningScreen from '../../components/OpeningScreen';
+
+export default function HomeTab() {
+  return <OpeningScreen />;   // 👈 actual design components/ se aa raha hai
+}
+jsx
+// components/OpeningScreen.js  -- YE ASAL DESIGN/LOGIC HAI
+export default function OpeningScreen() {
+  return ( /* poora animated LogicLand design */ );
+}
+
+Isay is tarah socho:
+
+app/ = address book — batata hai konsi screen kis URL pe hai
+components/ = actual saman — jo screens/widgets banate hain
+
+Fayda ye hai:
+
+Ek component (jese ThemedText) ko multiple screens mein reuse kar sakte ho, bina code repeat kiye
+app/ folder saaf/simple rehta hai (sirf routing logic), aur components/ mein heavy design code alag rehta hai
+Agar OpeningScreen design badalna ho, to sirf ek file (components/OpeningScreen.js) edit karni parti hai — chahay wo kitni bhi jagah use ho rahi ho
+

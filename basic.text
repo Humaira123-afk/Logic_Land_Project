@@ -1,15 +1,91 @@
 Hi! This is the basic learning and the basic steps during the project we will learn 
 
-1- Node.js install  | node -v, npm -v
-2- Expo project  | npx create-expo-app LogicLand
--> cd LogicLand
--> npx expo start
+1- Node.js install check karna
 
-3- App -> tab k andr hoga hmare pas index.js wali screen us pe kam krna hai like routing k liye 
+node -v
+npm -v
 
-4- Components k andr sari files jo jo needed hain jese theme , island map , profile , logic
- 
-4- "Replace emojis by icons"npx expo install react-native-svg 
+Ye check karta hai ke Node.js aur npm (package manager) system pe installed hain ya nahi — React Native/Expo inhi pe chalta hai.
 
+2- Expo project banana
 
+npx create-expo-app LogicLand
+cd LogicLand
+npx expo start
+
+Ye ek naya React Native project banata hai Expo ke saath (Expo = easy tareeqa RN app banane ka, bina Android Studio/Xcode setup ke).
+
+3- app/ folder — routing ka dimaag
+Expo Router mein file ka naam hi route ban jata hai. Jese:
+
+app/
+ ├── (tabs)/
+ │    ├── index.tsx     👈 ye "Home" tab hai
+ │    ├── explore.tsx   👈 ye "Explore" tab hai
+ │    └── _layout.tsx   👈 tabs ka design/config
+ ├── login.tsx          👈 route bana: /login
+ └── _layout.tsx        👈 poori app ka wrapper
+
+(tabs) folder ke naam ke aagay-peechay brackets hain — iska matlab hai ye route mein nahi dikhega, sirf tabs ko group karne ke liye hai.
+
+4- components/ folder — reusable UI pieces
+Yahan wo screens/parts rakhte hain jo app/ folder ke andar use hotay hain:
+
+components/
+ ├── OpeningScreen.js   👈 splash screen (jo humne banaya)
+ ├── themed-text.tsx    👈 reusable Text component
+ └── themed-view.tsx    👈 reusable View component
+
+Farq ye hai: app/ = routes (kis URL pe kya screen khulti hai), components/ = building blocks (jo screens ke andar use hotay hain).
+
+Import aise karte hain:
+
+jsx
+import OpeningScreen from '../../components/OpeningScreen';
+
+5- assets/images/ — pictures rakhna
+
+assets/images/character-bg.png
+
+Aur code mein use:
+
+jsx
+<ImageBackground source={require('../assets/images/character-bg.png')} />
+
+6- Animation — Animated API
+
+jsx
+const anim = new Animated.Value(0); // 0 se 1 tak move karega
+
+Animated.timing(anim, {
+  toValue: 1,
+  duration: 400,
+  useNativeDriver: true,
+}).start();
+
+Free hai, React Native ke andar hi built-in hai.
+
+7- Navigation — expo-router
+
+jsx
+import { router } from 'expo-router';
+
+router.push('/login');     // aage jao, wapas aa sakte ho
+router.replace('/login');  // aage jao, wapas NAHI aa sakte
+router.back();              // pichli screen pe wapas jao
+
+8- Emojis ki jagah icons use karna
+Emoji : alag alag phone pe alag dikhte hain — professional app mein icon library use karte hain:
+
+npx expo install react-native-svg
+npx expo install @expo/vector-icons
+
+Use karne ka tareeqa:
+
+jsx
+import { Ionicons } from '@expo/vector-icons';
+
+<Ionicons name="home" size={24} color="#2A2550" />
+
+@expo/vector-icons mein Ionicons, MaterialIcons, FontAwesome waghera sab free milte hain, koi emoji ki zaroorat nahi.
 
