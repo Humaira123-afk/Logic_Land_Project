@@ -8,8 +8,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ImageBackground,
 } from 'react-native';
 import { router } from 'expo-router';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
+import { auth } from '../config/firebaseConfig';
 
 export default function LoginScreen() {
   // true = Login mode, false = Signup mode
@@ -19,37 +25,48 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = () => {
-    if (isLogin) {
-      // 👇 Yahan apna login logic / API call lagayein
-      console.log('Login attempt:', { email, password });
-    } else {
-      // 👇 Yahan apna signup logic / API call lagayein
-      console.log('Signup attempt:', { name, email, password });
+  const [errorMsg, setErrorMsg] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    setErrorMsg('');
+
+    // Basic validation
+    if (!email || !password) {
+      setErrorMsg('Email aur password dono zaroori hain');
+      return;
     }
 
-    router.replace('/(tabs)');
+    setLoading(true);
+
+    try {
+      if (isLogin) {
+        // ---- LOGIN ----
+        // Firebase check karega: email exist karta hai? password sahi hai?
+        await signInWithEmailAndPassword(auth, email, password);
+      } else {
+        // ---- SIGNUP ----
+        // Firebase naya account banayega aur user ko login bhi kar dega
+        await createUserWithEmailAndPassword(auth, email, password);
+      }
+
+      // Success - home screen pe bhej do
+      router.replace('/(tabs)');
+    } catch (error) {
+      // Firebase khud batata hai kya galat hua (jese "email already in use")
+      setErrorMsg(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <View style={styles.screen}>
-      {/* ---------- Decorative background elements (same palette as splash) ---------- */}
-      <View style={styles.dotGrid}>
-        {Array.from({ length: 9 }).map((_, i) => (
-          <View key={i} style={styles.dot} />
-        ))}
-      </View>
-
-      <View style={styles.star} />
-
-      <View style={styles.ballTopLeft} />
-      <View style={styles.ballBottom} />
-
-      <View style={styles.leafShape} />
-
-      <View style={styles.blobBottom} />
-
-      {/* ---------- Login/Signup form ---------- */}
+    <ImageBackground
+      // 👇 Neeche wali decorative background image
+      source={require('../assets/images/login-bg.png')}
+      style={styles.screen}
+      resizeMode="cover"
+    >
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -106,9 +123,17 @@ export default function LoginScreen() {
               />
             </View>
 
-            <Pressable style={styles.submitBtn} onPress={handleSubmit}>
+            {errorMsg ? (
+              <Text style={styles.errorText}>{errorMsg}</Text>
+            ) : null}
+
+            <Pressable
+              style={[styles.submitBtn, loading && { opacity: 0.6 }]}
+              onPress={handleSubmit}
+              disabled={loading}
+            >
               <Text style={styles.submitText}>
-                {isLogin ? 'Login' : 'Sign Up'}
+                {loading ? 'Please wait...' : isLogin ? 'Login' : 'Sign Up'}
               </Text>
             </Pressable>
 
@@ -125,14 +150,13 @@ export default function LoginScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#F1ECFB', // same light purple as splash screen
   },
   flex: { flex: 1 },
   container: {
@@ -143,86 +167,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  // ---------- Decorative shapes (matching splash screen palette) ----------
-  dotGrid: {
-    position: 'absolute',
-    top: 55,
-    right: 28,
-    width: 54,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    zIndex: 0,
-  },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#A78BFA' },
-
-  star: {
-    position: 'absolute',
-    top: 100,
-    left: 24,
-    width: 34,
-    height: 34,
-    backgroundColor: '#F5A8BC',
-    transform: [{ rotate: '20deg' }],
-    zIndex: 0,
-    borderRadius: 6,
-  },
-
-  ballTopLeft: {
-    position: 'absolute',
-    top: 45,
-    left: 110,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: '#F5A8BC',
-    zIndex: 0,
-  },
-
-  ballBottom: {
-    position: 'absolute',
-    bottom: 80,
-    left: 30,
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: '#8A7CF0',
-    zIndex: 0,
-  },
-
-  leafShape: {
-    position: 'absolute',
-    top: 170,
-    right: 10,
-    width: 80,
-    height: 100,
-    backgroundColor: '#B8A9F0',
-    opacity: 0.8,
-    borderTopLeftRadius: 70,
-    borderBottomRightRadius: 70,
-    transform: [{ rotate: '-15deg' }],
-    zIndex: 0,
-  },
-
-  blobBottom: {
-    position: 'absolute',
-    bottom: 20,
-    right: -10,
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#8A7CF0',
-    opacity: 0.35,
-    zIndex: 0,
-  },
-
   // ---------- Form card ----------
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 28,
     paddingHorizontal: 24,
     paddingVertical: 32,
-    zIndex: 1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.08,
@@ -259,6 +209,13 @@ const styles = StyleSheet.create({
     color: '#2A2550',
     borderWidth: 1,
     borderColor: '#E3DCF7',
+  },
+
+  errorText: {
+    color: '#E24C4C',
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 12,
   },
 
   submitBtn: {

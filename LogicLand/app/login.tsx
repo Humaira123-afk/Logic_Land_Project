@@ -1,8 +1,15 @@
 // app/login.tsx
 // Ye file ROUTE hai (URL "/login" is se banta hai)
-// Asal design/logic components/Login.js mein hai
-import Login from '../components/Login';
+// Asal design/logic components/login.js mein hai
+import { Stack } from 'expo-router';
+import Login from '../components/login';
 
 export default function LoginRoute() {
-  return <Login />;
+  return (
+    <>
+      {/* Header hide karne ke liye */}
+      <Stack.Screen options={{ headerShown: false }} />
+      <Login />
+    </>
+  );
 }
